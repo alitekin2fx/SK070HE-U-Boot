@@ -80,6 +80,11 @@ static inline int board_is_icev2(void)
 	return board_ti_is("A335_ICE") && !strncmp("2", board_ti_get_rev(), 1);
 }
 
+static inline int board_is_samkoon(void)
+{
+    return board_ti_is("AM335X_SAMKOON");
+}
+
 /*
  * We have three pin mux functions that must exist.  We must be able to enable
  * uart0, for initial output and i2c0 to read the main EEPROM.  We then have a

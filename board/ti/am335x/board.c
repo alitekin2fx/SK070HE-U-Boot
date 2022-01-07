@@ -92,26 +92,26 @@ struct serial_device *default_serial_console(void)
 
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 static const struct ddr_data ddr2_data = {
-	.datardsratio0 = MT47H128M16RT25E_RD_DQS,
-	.datafwsratio0 = MT47H128M16RT25E_PHY_FIFO_WE,
-	.datawrsratio0 = MT47H128M16RT25E_PHY_WR_DATA,
+	.datardsratio0 = NT5TU64M16HGAC_RD_DQS,
+	.datafwsratio0 = NT5TU64M16HGAC_PHY_FIFO_WE,
+	.datawrsratio0 = NT5TU64M16HGAC_PHY_WR_DATA,
 };
 
 static const struct cmd_control ddr2_cmd_ctrl_data = {
-	.cmd0csratio = MT47H128M16RT25E_RATIO,
+	.cmd0csratio = NT5TU64M16HGAC_RATIO,
 
-	.cmd1csratio = MT47H128M16RT25E_RATIO,
+	.cmd1csratio = NT5TU64M16HGAC_RATIO,
 
-	.cmd2csratio = MT47H128M16RT25E_RATIO,
+	.cmd2csratio = NT5TU64M16HGAC_RATIO,
 };
 
 static const struct emif_regs ddr2_emif_reg_data = {
-	.sdram_config = MT47H128M16RT25E_EMIF_SDCFG,
-	.ref_ctrl = MT47H128M16RT25E_EMIF_SDREF,
-	.sdram_tim1 = MT47H128M16RT25E_EMIF_TIM1,
-	.sdram_tim2 = MT47H128M16RT25E_EMIF_TIM2,
-	.sdram_tim3 = MT47H128M16RT25E_EMIF_TIM3,
-	.emif_ddr_phy_ctlr_1 = MT47H128M16RT25E_EMIF_READ_LATENCY,
+	.sdram_config = NT5TU64M16HGAC_EMIF_SDCFG,
+	.ref_ctrl = NT5TU64M16HGAC_EMIF_SDREF,
+	.sdram_tim1 = NT5TU64M16HGAC_EMIF_TIM1,
+	.sdram_tim2 = NT5TU64M16HGAC_EMIF_TIM2,
+	.sdram_tim3 = NT5TU64M16HGAC_EMIF_TIM3,
+	.emif_ddr_phy_ctlr_1 = NT5TU64M16HGAC_EMIF_READ_LATENCY,
 };
 
 static const struct emif_regs ddr2_evm_emif_reg_data = {
@@ -538,6 +538,14 @@ const struct ctrl_ioregs ioregs = {
 	.dt1ioctl		= MT47H128M16RT25E_IOCTRL_VALUE,
 };
 
+const struct ctrl_ioregs ioregs_samkoon = {
+	.cm0ioctl		= NT5TU64M16HGAC_IOCTRL_VALUE,
+	.cm1ioctl		= NT5TU64M16HGAC_IOCTRL_VALUE,
+	.cm2ioctl		= NT5TU64M16HGAC_IOCTRL_VALUE,
+	.dt0ioctl		= NT5TU64M16HGAC_IOCTRL_VALUE,
+	.dt1ioctl		= NT5TU64M16HGAC_IOCTRL_VALUE,
+};
+
 void sdram_init(void)
 {
 	if (board_is_evm_sk()) {
@@ -573,7 +581,7 @@ void sdram_init(void)
 		config_ddr(266, &ioregs, &ddr2_data,
 			   &ddr2_cmd_ctrl_data, &ddr2_evm_emif_reg_data, 0);
 	else
-		config_ddr(266, &ioregs, &ddr2_data,
+		config_ddr(100, &ioregs_samkoon, &ddr2_data,
 			   &ddr2_cmd_ctrl_data, &ddr2_emif_reg_data, 0);
 }
 #endif
@@ -838,7 +846,7 @@ int board_late_init(void)
 		name = "BBG1";
 	if (board_is_bben())
 		name = "BBEN";
-	set_board_info_env(name);
+	set_board_info_env("AM335X_SAMKOON");
 
 	/*
 	 * Default FIT boot on HS devices. Non FIT images are not allowed
@@ -965,6 +973,8 @@ int board_fit_config_name_match(const char *name)
 	else if (board_is_bbg1() && !strcmp(name, "am335x-bonegreen"))
 		return 0;
 	else if (board_is_icev2() && !strcmp(name, "am335x-icev2"))
+		return 0;
+	else if (board_is_samkoon() && !strcmp(name, "am335x-samkoon"))
 		return 0;
 	else
 		return -1;

@@ -31,6 +31,21 @@
 #define V_OSCK				24000000  /* Clock output from T2 */
 #define V_SCLK				(V_OSCK)
 
+#define TFTPARGS \
+	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0" \
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
+	"tftpargs=setenv bootargs console=${console} " \
+		"${optargs} " \
+		"root=${tftproot} " \
+		"rootfstype=${tftprootfstype}\0" \
+	"tftproot=ubi0:rootfs rw ubi.mtd=NAND.file-system,2048\0" \
+	"tftprootfstype=ubifs rootwait=1\0" \
+	"tftpboot=echo Booting from TFTP ...; " \
+		"run tftpargs; " \
+		"tftp ${loadaddr} zImage; " \
+		"tftp ${fdtaddr} am335x-samkoon.dtb; " \
+		"bootz ${loadaddr} - ${fdtaddr}\0"
+
 #ifdef CONFIG_MTD_RAW_NAND
 #define NANDARGS \
 	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0" \
@@ -60,7 +75,7 @@
 	#devtypel #instance " "
 
 #define BOOTENV_DEV_NAND(devtypeu, devtypel, instance) \
-	"bootcmd_" #devtypel "=" \
+	"bootcmd_" #devtypel  #instance "=" \
 	"run nandboot\0"
 
 #define BOOTENV_DEV_NAME_NAND(devtypeu, devtypel, instance) \
@@ -79,13 +94,7 @@
 #endif
 
 #define BOOT_TARGET_DEVICES(func) \
-	func(MMC, mmc, 0) \
-	func(LEGACY_MMC, legacy_mmc, 0) \
-	func(MMC, mmc, 1) \
-	func(LEGACY_MMC, legacy_mmc, 1) \
-	func(NAND, nand, 0) \
-	BOOT_TARGET_PXE(func) \
-	BOOT_TARGET_DHCP(func)
+	func(NAND, nand, 0)
 
 #include <config_distro_bootcmd.h>
 
@@ -107,7 +116,7 @@
 		"name=bootloader,start=384K,size=1792K," \
 			"uuid=${uuid_gpt_bootloader};" \
 		"name=rootfs,start=2688K,size=-,uuid=${uuid_gpt_rootfs}\0" \
-	"optargs=\0" \
+	"optargs= mem=128M earlyprintk\0" \
 	"ramroot=/dev/ram0 rw\0" \
 	"ramrootfstype=ext2\0" \
 	"spiroot=/dev/mtdblock4 rw\0" \
@@ -157,6 +166,8 @@
 			"setenv fdtfile am335x-icev2.dtb; fi; " \
 		"if test $board_name = A335_ICE && test $ice_mii = mii; then " \
 			"setenv fdtfile am335x-icev2-prueth.dtb; fi; " \
+		"if test $board_name = AM335X_SAMKOON; then " \
+			"setenv fdtfile am335x-samkoon.dtb; fi; " \
 		"if test $fdtfile = undefined; then " \
 			"echo WARNING: Could not determine device tree to use; fi; \0" \
 	"init_console=" \
@@ -168,6 +179,7 @@
 	NANDARGS \
 	NETARGS \
 	DFUARGS \
+	TFTPARGS \
 	BOOTENV
 #endif
 
@@ -320,5 +332,8 @@
 #define CONFIG_CLOCK_SYNTHESIZER
 #define CLK_SYNTHESIZER_I2C_ADDR 0x65
 #endif
+
+#define CONFIG_SYS_MEMTEST_START 	0x80000000
+#define CONFIG_SYS_MEMTEST_END		0x88000000
 
 #endif	/* ! __CONFIG_AM335X_EVM_H */

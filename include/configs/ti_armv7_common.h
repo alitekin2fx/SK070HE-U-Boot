@@ -47,9 +47,10 @@
 #define DEFAULT_LINUX_BOOT_ENV \
 	"loadaddr=0x82000000\0" \
 	"kernel_addr_r=0x82000000\0" \
-	"fdtaddr=0x88000000\0" \
+	"fdt_high=0xffffffff\0" \
+	"fdtaddr=0x84000000\0" \
 	"dtboaddr=0x89000000\0" \
-	"fdt_addr_r=0x88000000\0" \
+	"fdt_addr_r=0x84000000\0" \
 	"rdaddr=0x88080000\0" \
 	"ramdisk_addr_r=0x88080000\0" \
 	"scriptaddr=0x80000000\0" \
